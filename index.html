@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Repaso Programación Móvil RDA1</title>
-    <meta name="description" content="Aplicación interactiva para repasar conceptos de Programación Móvil RDA1">
+    <meta name="description" content="Cuestionario interactivo para repasar conceptos de Programación Móvil RDA1 - Kotlin, Android, OOP y Programación Funcional">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -17,15 +17,78 @@
         <div class="blob blob-2"></div>
     </div>
 
-    <main class="app-container">
+    <!-- PANTALLA DE SELECCIÓN DE BANCO -->
+    <div id="screen-selection" class="screen-selection">
+        <div class="selection-container">
+            <div class="selection-header">
+                <h1>📱 Repaso Móvil RDA1</h1>
+                <p>Selecciona el banco de preguntas que quieres estudiar</p>
+            </div>
+            <div class="bank-grid">
+                <button class="bank-card" id="bank-all" onclick="selectBank('all')">
+                    <div class="bank-icon">🌐</div>
+                    <div class="bank-info">
+                        <h3>Banco Completo</h3>
+                        <span class="bank-count">50 preguntas del Ejemplo</span>
+                        <p>Preguntas del archivo Ejemplo Preguntas original</p>
+                    </div>
+                    <div class="bank-arrow"><i data-lucide="chevron-right"></i></div>
+                </button>
+                <button class="bank-card" id="bank-1" onclick="selectBank('week1')">
+                    <div class="bank-icon">🏗️</div>
+                    <div class="bank-info">
+                        <h3>Semana 1</h3>
+                        <span class="bank-count">40 preguntas</span>
+                        <p>Ecosistema Móvil: Kernel, ART, iOS vs Android, Seguridad</p>
+                    </div>
+                    <div class="bank-arrow"><i data-lucide="chevron-right"></i></div>
+                </button>
+                <button class="bank-card" id="bank-2" onclick="selectBank('week2')">
+                    <div class="bank-icon">🛡️</div>
+                    <div class="bank-info">
+                        <h3>Semana 2</h3>
+                        <span class="bank-count">40 preguntas</span>
+                        <p>Kotlin: Tipos, val/var, Null Safety, when, Estilo</p>
+                    </div>
+                    <div class="bank-arrow"><i data-lucide="chevron-right"></i></div>
+                </button>
+                <button class="bank-card" id="bank-3" onclick="selectBank('week3')">
+                    <div class="bank-icon">⚙️</div>
+                    <div class="bank-info">
+                        <h3>Semana 3</h3>
+                        <span class="bank-count">40 preguntas</span>
+                        <p>Kotlin Avanzado: Data Classes, Sealed, Lambdas, Scope Functions</p>
+                    </div>
+                    <div class="bank-arrow"><i data-lucide="chevron-right"></i></div>
+                </button>
+                <button class="bank-card bank-card-full" id="bank-all-new" onclick="selectBank('allNew')">
+                    <div class="bank-icon">🚀</div>
+                    <div class="bank-info">
+                        <h3>Todo el Contenido</h3>
+                        <span class="bank-count">170 preguntas</span>
+                        <p>Las 50 del Ejemplo + 40 de cada semana (1, 2 y 3)</p>
+                    </div>
+                    <div class="bank-arrow"><i data-lucide="chevron-right"></i></div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PANTALLA DEL CUESTIONARIO -->
+    <main class="app-container hidden" id="screen-quiz">
         <header class="header">
             <div class="header-top">
-                <h1>Repaso Móvil RDA1</h1>
+                <div class="title-area">
+                    <button id="btn-home" class="icon-btn" title="Cambiar banco de preguntas">
+                        <i data-lucide="home"></i>
+                    </button>
+                    <h1 id="app-title">Repaso Móvil RDA1</h1>
+                </div>
                 <div class="actions">
                     <button id="btn-reset" class="icon-btn" title="Reiniciar Progreso">
                         <i data-lucide="rotate-ccw"></i>
                     </button>
-                    <button id="btn-filter" class="icon-btn" title="Modo Repaso">
+                    <button id="btn-filter" class="icon-btn" title="Modo Repaso (Marcadas/Erróneas)">
                         <i data-lucide="filter"></i>
                     </button>
                 </div>
@@ -80,7 +143,11 @@
         </footer>
     </main>
 
+    <!-- Scripts de preguntas -->
     <script src="questions.js"></script>
+    <script src="questions_week1.js"></script>
+    <script src="questions_week2.js"></script>
+    <script src="questions_week3.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
