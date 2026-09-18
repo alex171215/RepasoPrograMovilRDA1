@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Repaso Programación Móvil RDA1</title>
+    <meta name="description" content="Aplicación interactiva para repasar conceptos de Programación Móvil RDA1">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <div class="background-elements">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+
+    <main class="app-container">
+        <header class="header">
+            <div class="header-top">
+                <h1>Repaso Móvil RDA1</h1>
+                <div class="actions">
+                    <button id="btn-reset" class="icon-btn" title="Reiniciar Progreso">
+                        <i data-lucide="rotate-ccw"></i>
+                    </button>
+                    <button id="btn-filter" class="icon-btn" title="Modo Repaso">
+                        <i data-lucide="filter"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="progress-container">
+                <div class="progress-bar-wrapper">
+                    <div id="progress-bar" class="progress-bar"></div>
+                </div>
+                <div class="progress-stats">
+                    <span id="question-counter">Pregunta 1 de 50</span>
+                    <span id="score-counter">Puntuación: 0</span>
+                </div>
+            </div>
+            
+            <div id="filter-mode-banner" class="banner hidden">
+                <i data-lucide="alert-circle"></i>
+                <span>Modo de repaso activado (Marcadas/Erróneas)</span>
+                <button id="btn-exit-filter" class="text-btn">Salir</button>
+            </div>
+        </header>
+
+        <section class="card glass-panel">
+            <div class="question-header">
+                <span class="badge" id="badge-status">Sin responder</span>
+                <button id="btn-bookmark" class="icon-btn bookmark-btn" title="Marcar pregunta">
+                    <i data-lucide="bookmark"></i>
+                </button>
+            </div>
+            
+            <h2 id="question-text" class="question-text">Cargando pregunta...</h2>
+
+            <div id="options-container" class="options-list">
+                <!-- Opciones se renderizan aquí dinámicamente -->
+            </div>
+
+            <div id="feedback-container" class="feedback-box hidden">
+                <div class="feedback-header">
+                    <i id="feedback-icon" data-lucide="info"></i>
+                    <h3 id="feedback-title">Resultado</h3>
+                </div>
+                <p id="feedback-text"></p>
+            </div>
+        </section>
+
+        <footer class="navigation">
+            <button id="btn-prev" class="btn btn-secondary" disabled>
+                <i data-lucide="arrow-left"></i> Anterior
+            </button>
+            <button id="btn-next" class="btn btn-primary">
+                Siguiente <i data-lucide="arrow-right"></i>
+            </button>
+        </footer>
+    </main>
+
+    <script src="questions.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
