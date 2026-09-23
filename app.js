@@ -253,6 +253,8 @@ function nextQuestion() {
         saveState();
         renderQuestion();
         window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+        alert('🎉 ¡Has llegado al final de este banco de preguntas!\nRevisa tu puntuación en el contador superior.');
     }
 }
 
@@ -319,9 +321,6 @@ function updateControls(validIndices) {
         ? 'Finalizar <i data-lucide="flag"></i>'
         : 'Siguiente <i data-lucide="arrow-right"></i>';
     elements.btnNext.disabled = false;
-    elements.btnNext.onclick = isLast
-        ? () => alert('🎉 ¡Has llegado al final de este banco de preguntas!\nRevisa tu puntuación en el contador superior.')
-        : nextQuestion;
 
     lucide.createIcons();
 }
