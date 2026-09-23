@@ -363,11 +363,12 @@ function toggleReviewMode() {
 }
 
 function resetProgress() {
-    if (confirm(`¿Seguro que quieres reiniciar el progreso del banco "${BANKS[state.currentBank].name}"? Esto eliminará respuestas y marcadores de este banco.`)) {
+    if (confirm(`¿Seguro que quieres reiniciar las respuestas del banco "${BANKS[state.currentBank].name}"? Las preguntas marcadas con 📌 NO se desmarcarán.`)) {
         // Borrar solo las claves de este banco
         const prefix = `${state.currentBank}_`;
         Object.keys(state.answers).forEach(k => { if (k.startsWith(prefix)) delete state.answers[k]; });
-        Object.keys(state.bookmarks).forEach(k => { if (k.startsWith(prefix)) delete state.bookmarks[k]; });
+        // Se elimina la limpieza de bookmarks para que persistan a menos que el usuario las desmarque manualmente
+        
         state.currentIndex = 0;
         state.reviewMode = false;
         state.shuffleState = null;
