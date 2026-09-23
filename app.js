@@ -168,10 +168,8 @@ function renderQuestion() {
         }
     }
 
-    // Verificar que el índice actual esté en la lista filtrada
-    if (!validIndices.includes(state.currentIndex)) {
-        state.currentIndex = validIndices.length > 0 ? validIndices[0] : 0;
-    }
+    // NO forzar state.currentIndex aquí. Esto permite que si el usuario responde bien 
+    // o desmarca la pregunta en modo repaso, siga viéndola hasta que navegue manualmente.
 
     const globalIndex = state.currentIndex;
     const question = activeQuestions[globalIndex];
@@ -247,9 +245,16 @@ function handleOptionClick(optionIndex) {
 
 function nextQuestion() {
     const validIndices = getFilteredIndices();
-    const currentPos = validIndices.indexOf(state.currentIndex);
-    if (currentPos < validIndices.length - 1) {
-        state.currentIndex = validIndices[currentPos + 1];
+    let nextIndex = -1;
+    for (let idx of validIndices) {
+        if (idx > state.currentIndex) {
+            nextIndex = idx;
+            break;
+        }
+    }
+
+    if (nextIndex !== -1) {
+        state.currentIndex = nextIndex;
         saveState();
         renderQuestion();
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -260,9 +265,16 @@ function nextQuestion() {
 
 function prevQuestion() {
     const validIndices = getFilteredIndices();
-    const currentPos = validIndices.indexOf(state.currentIndex);
-    if (currentPos > 0) {
-        state.currentIndex = validIndices[currentPos - 1];
+    let prevIndex = -1;
+    for (let i = validIndices.length - 1; i >= 0; i--) {
+        if (validIndices[i] < state.currentIndex) {
+            prevIndex = validIndices[i];
+            break;
+        }
+    }
+
+    if (prevIndex !== -1) {
+        state.currentIndex = prevIndex;
         saveState();
         renderQuestion();
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -283,7 +295,7 @@ function toggleBookmark() {
 function toggleReviewMode() {
     state.reviewMode = !state.reviewMode;
     const valid = getFilteredIndices();
-    if (valid.length > 0) {
+    if (state.reviewMode && valid.length > 0 && !valid.includes(state.currentIndex)) {
         state.currentIndex = valid[0];
     }
     saveState();
@@ -313,11 +325,12 @@ function updateControls(validIndices) {
         return;
     }
 
-    const currentPos = validIndices.indexOf(state.currentIndex);
-    elements.btnPrev.disabled = currentPos <= 0;
+    const hasPrev = validIndices.some(idx => idx < state.currentIndex);
+    const hasNext = validIndices.some(idx => idx > state.currentIndex);
 
-    const isLast = currentPos >= validIndices.length - 1;
-    elements.btnNext.innerHTML = isLast
+    elements.btnPrev.disabled = !hasPrev;
+
+    elements.btnNext.innerHTML = !hasNext
         ? 'Finalizar <i data-lucide="flag"></i>'
         : 'Siguiente <i data-lucide="arrow-right"></i>';
     elements.btnNext.disabled = false;
@@ -347,8 +360,12 @@ function updateProgress() {
 
     const validIndices = getFilteredIndices();
     const displayTotal = state.reviewMode ? validIndices.length : total;
-    const currentPos = validIndices.indexOf(state.currentIndex) + 1;
-    const displayPos = currentPos > 0 ? currentPos : 0;
+    let currentPos = validIndices.indexOf(state.currentIndex) + 1;
+    if (currentPos === 0 && state.reviewMode) {
+        // Si la pregunta actual ya no está en validIndices, aproximamos su posición
+        currentPos = validIndices.filter(idx => idx < state.currentIndex).length + 1;
+    }
+    const displayPos = currentPos;
 
     elements.questionCounter.textContent = `Pregunta ${displayPos} de ${displayTotal}`;
     elements.scoreCounter.textContent = `✓ ${correctCount} / ${total}`;
