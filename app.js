@@ -18,7 +18,8 @@ const state = {
     answers: {},   // "bankName_index" -> selectedOptionIndex
     bookmarks: {}, // "bankName_index" -> boolean
     reviewMode: false,
-    currentBank: null
+    currentBank: null,
+    shuffleState: null
 };
 
 // ================================================================
@@ -46,14 +47,18 @@ const elements = {
     progressBar: document.getElementById('progress-bar'),
     questionCounter: document.getElementById('question-counter'),
     scoreCounter: document.getElementById('score-counter'),
-    filterModeBanner: document.getElementById('filter-mode-banner')
+    filterModeBanner: document.getElementById('filter-mode-banner'),
+    btnShuffle: document.getElementById('btn-shuffle'),
+    btnResetReview: document.getElementById('btn-reset-review')
 };
 
 // ================================================================
 // BANK KEY HELPERS (para separar el progreso por banco)
 // ================================================================
 function makeKey(index) {
-    return `${state.currentBank}_${index}`;
+    const q = activeQuestions[index];
+    const origId = q ? q.originalIndex : index;
+    return `${state.currentBank}_${origId}`;
 }
 
 // ================================================================
@@ -80,6 +85,7 @@ function loadState() {
             state.bookmarks = parsed.bookmarks || {};
             state.reviewMode = parsed.reviewMode || false;
             state.currentBank = parsed.currentBank || null;
+            state.shuffleState = parsed.shuffleState || null;
         } catch (e) {
             console.error('Error parsing state', e);
         }
@@ -101,7 +107,22 @@ function startQuiz(bankName, reset) {
     if (!BANKS[bankName]) return;
 
     state.currentBank = bankName;
-    activeQuestions = BANKS[bankName].questions();
+    
+    // Clonar las preguntas y asignarles un originalIndex
+    let questions = BANKS[bankName].questions().map((q, i) => ({
+        ...q,
+        originalIndex: i
+    }));
+
+    // Restaurar orden mezclado si existe
+    if (state.shuffleState && state.shuffleState.bank === bankName && state.shuffleState.order) {
+        const order = state.shuffleState.order;
+        if (order.length === questions.length) {
+            questions = order.map(origIdx => questions.find(q => q.originalIndex === origIdx));
+        }
+    }
+    
+    activeQuestions = questions;
 
     if (reset) {
         state.currentIndex = 0;
@@ -292,6 +313,45 @@ function toggleBookmark() {
     renderQuestion();
 }
 
+function resetReviewProgress() {
+    if (confirm("¿Seguro que quieres borrar tus respuestas de las preguntas que estás repasando para volver a intentarlas? (Asegúrate de marcarlas con 📌 para que no desaparezcan del repaso)")) {
+        const validIndices = getFilteredIndices();
+        validIndices.forEach(idx => {
+            const key = makeKey(idx);
+            delete state.answers[key];
+        });
+        saveState();
+        renderQuestion();
+    }
+}
+
+function shuffleQuestions() {
+    for (let i = activeQuestions.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [activeQuestions[i], activeQuestions[j]] = [activeQuestions[j], activeQuestions[i]];
+    }
+    
+    state.shuffleState = {
+        bank: state.currentBank,
+        order: activeQuestions.map(q => q.originalIndex)
+    };
+    
+    const valid = getFilteredIndices();
+    if (valid.length > 0) {
+        state.currentIndex = valid[0];
+    } else {
+        state.currentIndex = 0;
+    }
+    
+    saveState();
+    renderQuestion();
+    
+    if (elements.btnShuffle) {
+        elements.btnShuffle.style.color = 'var(--primary-color)';
+        setTimeout(() => elements.btnShuffle.style.color = '', 500);
+    }
+}
+
 function toggleReviewMode() {
     state.reviewMode = !state.reviewMode;
     const valid = getFilteredIndices();
@@ -310,6 +370,14 @@ function resetProgress() {
         Object.keys(state.bookmarks).forEach(k => { if (k.startsWith(prefix)) delete state.bookmarks[k]; });
         state.currentIndex = 0;
         state.reviewMode = false;
+        state.shuffleState = null;
+        
+        // Reload questions to original order
+        activeQuestions = BANKS[state.currentBank].questions().map((q, i) => ({
+            ...q,
+            originalIndex: i
+        }));
+
         saveState();
         renderQuestion();
     }
@@ -347,10 +415,14 @@ function updateProgress() {
 
     Object.keys(state.answers).forEach(key => {
         if (!key.startsWith(prefix)) return;
-        const idx = parseInt(key.replace(prefix, ''));
-        if (isNaN(idx) || idx >= total) return;
+        const originalIdx = parseInt(key.replace(prefix, ''));
+        if (isNaN(originalIdx)) return;
+        
+        const q = activeQuestions.find(q => q.originalIndex === originalIdx);
+        if (!q) return;
+
         answeredCount++;
-        if (state.answers[key] === activeQuestions[idx].correctIndex) {
+        if (state.answers[key] === q.correctIndex) {
             correctCount++;
         }
     });
@@ -386,6 +458,8 @@ function setupEventListeners() {
         saveState();
         renderQuestion();
     });
+    if (elements.btnShuffle) elements.btnShuffle.addEventListener('click', shuffleQuestions);
+    if (elements.btnResetReview) elements.btnResetReview.addEventListener('click', resetReviewProgress);
 }
 
 // ================================================================
