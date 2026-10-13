@@ -2,11 +2,15 @@
 // APP STATE & CONFIGURATION
 // ================================================================
 const BANKS = {
-    'all':     { name: 'Banco Completo (Ejemplo)', questions: () => questions },
-    'week1':   { name: 'Semana 1 - Ecosistema Móvil', questions: () => questionsWeek1 },
-    'week2':   { name: 'Semana 2 - Kotlin Fundamentos', questions: () => questionsWeek2 },
-    'week3':   { name: 'Semana 3 - Kotlin Avanzado', questions: () => questionsWeek3 },
-    'allNew':  { name: 'Todo el Contenido', questions: () => [...questions, ...questionsWeek1, ...questionsWeek2, ...questionsWeek3] }
+    'all':      { name: 'Banco Completo (Ejemplo)', questions: () => questions },
+    'week1':    { name: 'Semana 1 - Ecosistema Móvil', questions: () => questionsWeek1 },
+    'week2':    { name: 'Semana 2 - Kotlin Fundamentos', questions: () => questionsWeek2 },
+    'week3':    { name: 'Semana 3 - Kotlin Avanzado', questions: () => questionsWeek3 },
+    'allNew':   { name: 'Todo el Contenido (RDA1)', questions: () => [...questions, ...questionsWeek1, ...questionsWeek2, ...questionsWeek3] },
+    'rda2t4':   { name: 'RDA2 - Tema 4: Ciclo de Vida', questions: () => questionsRDA2Tema4 },
+    'rda2t56':  { name: 'RDA2 - Temas 5-6: UI Declarativa y Compose', questions: () => questionsRDA2Tema56 },
+    'rda2t78':  { name: 'RDA2 - Temas 7-8: Material You y Navegación', questions: () => questionsRDA2Tema78 },
+    'rda2mega': { name: 'RDA2 - Mega Banco', questions: () => [...questionsRDA2Tema4, ...questionsRDA2Tema56, ...questionsRDA2Tema78] }
 };
 
 // Estado de la aplicación
