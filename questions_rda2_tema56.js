@@ -212,5 +212,64 @@ const questionsRDA2Tema56 = [
     options: ["El hecho de que Compose y SwiftUI sean los únicos frameworks de UI que pueden compilar a WebAssembly, permitiendo ejecutar apps móviles en navegadores.", "El hecho de que Compose y SwiftUI son lenguajes especializados (DSL) construidos sobre Kotlin y Swift respectivamente, que transforman el lenguaje de propósito general en una herramienta específica para describir interfaces declarativas sin escribir algoritmos complejos.", "El hecho de que el código Compose puede ser procesado por herramientas de diseño como Figma para generar prototipos automáticamente.", "El hecho de que tanto Compose como SwiftUI eliminan la necesidad de conocer el lenguaje base (Kotlin y Swift) para construir interfaces de usuario completas."],
     correctIndex: 1,
     feedback: "La respuesta correcta es b. El Fenómeno DSL: Compose es 'un lenguaje dentro de Kotlin' diseñado específicamente para describir UIs. SwiftUI es 'un lenguaje dentro de Swift' con el mismo propósito. No se escriben algoritmos: se describe qué se quiere ver. Este fenómeno explica por qué el código de Compose/SwiftUI es tan legible y expresivo comparado con el imperativo."
-  }
+  },
+{
+  "question": "En Jetpack Compose, ¿por qué el orden de encadenamiento de los Modifiers es crítico para el resultado visual final?",
+  "options": [
+    "Porque el compilador de Compose ejecuta los Modifiers en paralelo y genera un error si no siguen un orden alfabético estricto.",
+    "Porque los Modifiers se aplican secuencialmente como un envoltorio (wrapper); por ejemplo, aplicar .padding() antes de .background() crea un margen externo sin color, mientras que invertirlo rellena el padding con dicho fondo.",
+    "Porque el motor de renderizado de Skia descarta cualquier Modifier que se declare después de un .clickable().",
+    "Porque los Modifiers modifican directamente el árbol de nodos de la vista XML subyacente y requieren que los límites del layout se fijen primero."
+  ],
+  "correctIndex": 1,
+  "feedback": "La respuesta correcta es b. En Compose los Modifiers se componen de izquierda a derecha / arriba hacia abajo envolviendo el elemento. Por eso, Modifier.padding(16.dp).background(Color.Red) dibuja el fondo dentro del padding, mientras que Modifier.background(Color.Red).padding(16.dp) dibuja el fondo ocupando todo el espacio y aplica el relleno por dentro."
+},
+{
+  "question": "¿Cuál es la función principal de remember { mutableStateOf(...) } en el ciclo de recomposición de una función Composable?",
+  "options": [
+    "Persistir el valor de la variable en el disco local para que sobreviva a la destrucción del proceso por parte del sistema operativo.",
+    "Preservar el estado en la memoria del runtime de Compose a través de sucesivas recomposiciones, evitando que la variable se reinicialice a su valor por defecto cada vez que la función se reejecuta.",
+    "Sincronizar el valor de la variable directamente con un StateFlow del ViewModel mediante corrutinas en segundo plano.",
+    "Evitar que el hilo principal (Main Thread) ejecute recomposiciones si el dispositivo tiene menos del 20% de batería restante."
+  ],
+  "correctIndex": 1,
+  "feedback": "La respuesta correcta es b. remember retiene el valor en el árbol de Compose durante las recomposiciones. Si solo usáramos mutableStateOf sin remember, cada vez que la función Composable se recomprende crearía una nueva instancia del estado con su valor inicial, perdiendo las modificaciones del usuario."
+},
+{
+  "question": "En la arquitectura de Compose, ¿qué se entiende por 'State Hoisting' (elevación de estado) y cuál es su principal ventaja?",
+  "options": [
+    "Mover la definición de estados a la capa de persistencia Room para que no ocupen memoria en el runtime.",
+    "Un patrón donde un Composable pasa su estado y eventos a su llamador (haciéndose stateless), pasando el valor como parámetro y los cambios como lambdas (eventos hacia arriba), mejorando la reutilización y testeabilidad.",
+    "Elevar los permisos de ejecución del proceso para que la UI tenga prioridad sobre los servicios en segundo plano.",
+    "Subir las clases de datos a un módulo Gradle compartido para que puedan ser utilizadas en entornos multiplataforma KMP."
+  ],
+  "correctIndex": 1,
+  "feedback": "La respuesta correcta es b. El State Hoisting convierte componentes con estado (stateful) en componentes sin estado (stateless): el llamador pasa el estado hacia abajo (value) y el componente emite eventos hacia arriba mediante lambdas (onValueChange), cumpliendo con el patrón UDF (Unidirectional Data Flow)."
+},
+{
+  "question": "¿Por qué un bucle de recomposición infinito (Recomposition Loop) ocurre cuando se muta un estado directamente en el cuerpo principal de un Composable?",
+  "options": [
+    "Porque el Garbage Collector no puede liberar la referencia del Composable mientras el hilo de renderizado esté activo.",
+    "Porque al mutar un estado observado dentro del cuerpo de la función, se notifica inmediatamente al runtime que debe recomponer, provocando una nueva ejecución inmediata que vuelve a mutar el estado indefinidamente.",
+    "Porque el compilador K2 confunde las lambdas con llamadas recursivas cuando superan los 60 fotogramas por segundo.",
+    "Porque el SO Android mata la Activity por considerar que hay un ataque de denegación de servicio en la capa UI."
+  ],
+  "correctIndex": 1,
+  "feedback": "La respuesta correcta es b. Las funciones Composable deben ser libres de efectos secundarios (side-effect free). Si se escribe 'state.value = newValue' en el cuerpo directo de la función, su ejecución cambia el estado, lo cual dispara otra recomposición, creando un bucle infinito que congela la UI."
+},
+{
+  "question": "¿Qué rol cumple el compilador especializado de Compose en comparación con el compilador estándar de Kotlin?",
+  "options": [
+    "Convierte el código Kotlin en XML en tiempo de compilación para que Android Runtime (ART) pueda inflarlo usando LayoutInflater.",
+    "Analiza las funciones anotadas con @Composable, inyecta parámetros sintéticos para rastrear la identidad y dependencias de estado de cada nodo, y genera el código que permite la recomposición inteligente y el saltado (skipping).",
+    "Reemplaza el bytecode de la JVM por llamadas directas a la API Vulkan del procesador gráfico.",
+    "Genera los archivos de Gradle y verifica que las dependencias de Material Design 3 estén actualizadas a su última versión."
+  ],
+  "correctIndex": 1,
+  "feedback": "La respuesta correcta es b. El compilador de Compose no es un compilador independiente sino un plugin del compilador de Kotlin que transforma las funciones @Composable inyectando un parámetro 'Composer' oculto y metadatos para rastrear qué partes cambiaron y omitir las que no cambiaron (smart skipping)."
+}
 ];
+
+if (typeof window !== 'undefined') {
+    window.questionsRDA2Tema56 = questionsRDA2Tema56;
+}

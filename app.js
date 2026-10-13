@@ -1,16 +1,37 @@
 // ================================================================
 // APP STATE & CONFIGURATION
 // ================================================================
+function getQuestions(arrayRef, windowPropName) {
+    if (typeof window !== 'undefined' && window[windowPropName] && Array.isArray(window[windowPropName]) && window[windowPropName].length > 0) {
+        return window[windowPropName];
+    }
+    try {
+        if (typeof arrayRef !== 'undefined' && Array.isArray(arrayRef) && arrayRef.length > 0) {
+            return arrayRef;
+        }
+    } catch(e) {}
+    return [];
+}
+
 const BANKS = {
-    'all':      { name: 'Banco Completo (Ejemplo)', questions: () => questions },
-    'week1':    { name: 'Semana 1 - Ecosistema Móvil', questions: () => questionsWeek1 },
-    'week2':    { name: 'Semana 2 - Kotlin Fundamentos', questions: () => questionsWeek2 },
-    'week3':    { name: 'Semana 3 - Kotlin Avanzado', questions: () => questionsWeek3 },
-    'allNew':   { name: 'Todo el Contenido (RDA1)', questions: () => [...questions, ...questionsWeek1, ...questionsWeek2, ...questionsWeek3] },
-    'rda2t4':   { name: 'RDA2 - Tema 4: Ciclo de Vida', questions: () => questionsRDA2Tema4 },
-    'rda2t56':  { name: 'RDA2 - Temas 5-6: UI Declarativa y Compose', questions: () => questionsRDA2Tema56 },
-    'rda2t78':  { name: 'RDA2 - Temas 7-8: Material You y Navegación', questions: () => questionsRDA2Tema78 },
-    'rda2mega': { name: 'RDA2 - Mega Banco', questions: () => [...questionsRDA2Tema4, ...questionsRDA2Tema56, ...questionsRDA2Tema78] }
+    'all':      { name: 'Banco Completo (Ejemplo)', questions: () => getQuestions(typeof questions !== 'undefined' ? questions : null, 'questions') },
+    'week1':    { name: 'Semana 1 - Ecosistema Móvil', questions: () => getQuestions(typeof questionsWeek1 !== 'undefined' ? questionsWeek1 : null, 'questionsWeek1') },
+    'week2':    { name: 'Semana 2 - Kotlin Fundamentos', questions: () => getQuestions(typeof questionsWeek2 !== 'undefined' ? questionsWeek2 : null, 'questionsWeek2') },
+    'week3':    { name: 'Semana 3 - Kotlin Avanzado', questions: () => getQuestions(typeof questionsWeek3 !== 'undefined' ? questionsWeek3 : null, 'questionsWeek3') },
+    'allNew':   { name: 'Todo el Contenido (RDA1)', questions: () => [
+        ...getQuestions(typeof questions !== 'undefined' ? questions : null, 'questions'),
+        ...getQuestions(typeof questionsWeek1 !== 'undefined' ? questionsWeek1 : null, 'questionsWeek1'),
+        ...getQuestions(typeof questionsWeek2 !== 'undefined' ? questionsWeek2 : null, 'questionsWeek2'),
+        ...getQuestions(typeof questionsWeek3 !== 'undefined' ? questionsWeek3 : null, 'questionsWeek3')
+    ]},
+    'rda2t4':   { name: 'RDA2 – Tema 4: Ciclo de Vida y Arquitectura', questions: () => getQuestions(typeof questionsRDA2Tema4 !== 'undefined' ? questionsRDA2Tema4 : null, 'questionsRDA2Tema4') },
+    'rda2t56':  { name: 'RDA2 – Temas 5-6: UI Declarativa y Compose', questions: () => getQuestions(typeof questionsRDA2Tema56 !== 'undefined' ? questionsRDA2Tema56 : null, 'questionsRDA2Tema56') },
+    'rda2t78':  { name: 'RDA2 – Temas 7-8: Material You y Navegación', questions: () => getQuestions(typeof questionsRDA2Tema78 !== 'undefined' ? questionsRDA2Tema78 : null, 'questionsRDA2Tema78') },
+    'rda2mega': { name: 'RDA2 – Mega Banco (Temas 4, 5-6, 7-8)', questions: () => [
+        ...getQuestions(typeof questionsRDA2Tema4 !== 'undefined' ? questionsRDA2Tema4 : null, 'questionsRDA2Tema4'),
+        ...getQuestions(typeof questionsRDA2Tema56 !== 'undefined' ? questionsRDA2Tema56 : null, 'questionsRDA2Tema56'),
+        ...getQuestions(typeof questionsRDA2Tema78 !== 'undefined' ? questionsRDA2Tema78 : null, 'questionsRDA2Tema78')
+    ]}
 };
 
 // Estado de la aplicación
@@ -69,7 +90,13 @@ function makeKey(index) {
 // INITIALIZATION
 // ================================================================
 function init() {
-    lucide.createIcons();
+    try {
+        if (typeof lucide !== 'undefined' && lucide.createIcons) {
+            lucide.createIcons();
+        }
+    } catch (e) {
+        console.warn('Advertencia al renderizar iconos Lucide:', e);
+    }
     loadState();
     setupEventListeners();
 
@@ -103,17 +130,37 @@ function saveState() {
 // ================================================================
 // BANK SELECTION
 // ================================================================
+let isSelectingBank = false;
 function selectBank(bankName) {
+    if (isSelectingBank) return;
+    isSelectingBank = true;
+    setTimeout(() => { isSelectingBank = false; }, 250);
     startQuiz(bankName, true);
+}
+if (typeof window !== 'undefined') {
+    window.selectBank = selectBank;
 }
 
 function startQuiz(bankName, reset) {
-    if (!BANKS[bankName]) return;
+    if (!BANKS[bankName]) {
+        console.error('[Repaso Quiz] Banco desconocido:', bankName, 'Bancos disponibles:', Object.keys(BANKS));
+        alert('No se encontró el banco seleccionado: "' + bankName + '". Por favor recarga con Ctrl+Shift+R.');
+        return;
+    }
+
+    const bank = BANKS[bankName];
+    const rawQuestions = bank.questions();
+
+    if (!rawQuestions || !Array.isArray(rawQuestions) || rawQuestions.length === 0) {
+        console.error('[Repaso Quiz] Preguntas vacías para el banco:', bankName);
+        alert('Las preguntas de "' + bank.name + '" no se han cargado todavía. Presiona Ctrl+Shift+R para refrescar la página.');
+        return;
+    }
 
     state.currentBank = bankName;
     
     // Clonar las preguntas y asignarles un originalIndex
-    let questions = BANKS[bankName].questions().map((q, i) => ({
+    let questions = rawQuestions.map((q, i) => ({
         ...q,
         originalIndex: i
     }));
@@ -462,7 +509,18 @@ function setupEventListeners() {
         state.reviewMode = false;
         saveState();
         renderQuestion();
+    
+    // Event listener adicional de respaldo para tarjetas de banco
+    document.querySelectorAll('.bank-card').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const onclickAttr = btn.getAttribute('onclick') || '';
+            const match = onclickAttr.match(/selectBank\(['\"]([^'\"]+)['\"]\)/);
+            if (match && match[1]) {
+                selectBank(match[1]);
+            }
+        });
     });
+});
     if (elements.btnShuffle) elements.btnShuffle.addEventListener('click', shuffleQuestions);
     if (elements.btnResetReview) elements.btnResetReview.addEventListener('click', resetReviewProgress);
 }

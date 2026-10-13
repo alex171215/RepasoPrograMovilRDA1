@@ -194,5 +194,97 @@ const questionsRDA2Tema78 = [
     options: ["El Árbol de Composición es destruido completamente cuando cambia el tema de Material You; Compose lo reconstruye desde cero como lo haría con un cambio de Activity.", "El Árbol de Composición permite que Compose identifique exactamente qué nodos dependen del estado del tema; al cambiar los colores de Material You, solo los Composables que leen del MaterialTheme.colorScheme son recompuestos, optimizando el cambio de tema.", "El Árbol de Composición no está relacionado con el sistema de temas; Material You usa un mecanismo independiente de invalidación visual para aplicar los nuevos colores.", "El Árbol de Composición es pausado durante el cambio de tema de Material You para evitar estados inconsistentes; el Motor Monet aplica la nueva paleta y luego el árbol se reanuda."],
     correctIndex: 1,
     feedback: "La respuesta correcta es b. La integración elegante: MaterialTheme.colorScheme es un objeto observable. Cuando Material You cambia la paleta, el colorScheme cambia como estado. Compose detecta qué nodos del árbol leen colorScheme.primary, colorScheme.surface, etc. y solo recompone esos nodos, no toda la pantalla. La Recomposición Inteligente garantiza que el cambio de tema sea eficiente."
-  }
+  },
+{
+  "question": "¿Cómo maneja Material Design 3 la elevación de superficies en comparación con el esquema anterior de Material 2?",
+  "options": [
+    "M3 aumentó el tamaño y desenfoque de las sombras proyectadas (Shadow Elevation) para lograr un efecto tridimensional más pronunciado.",
+    "M3 sustituyó predominantemente las sombras pesadas por la Elevación Tonal (Tonal Elevation), superponiendo un tinte del color primario sobre la superficie según el nivel de elevación para una jerarquía más sutil y adaptable a temas oscuros.",
+    "M3 eliminó todas las superficies elevadas y obliga a que todos los componentes sean completamente planos sin distinción visual.",
+    "M3 delega el cálculo de sombras al sensor de luz ambiental del dispositivo para variar la sombra según la iluminación del entorno."
+  ],
+  "correctIndex": 1,
+  "feedback": "La respuesta correcta es b. En Material You (M3), la elevación se comunica a través de Tonal Elevation: a mayor nivel de elevación (Surface 1 a 5), mayor es el tinte del color primario mezclado con la superficie. Esto mejora notablemente el contraste y la estética, especialmente en temas oscuros donde las sombras negras son invisibles."
+},
+{
+  "question": "¿Cuál es la función del componente Scaffold en Jetpack Compose dentro de una interfaz construida bajo lineamientos de Material Design 3?",
+  "options": [
+    "Es una herramienta de depuración que dibuja líneas de guía y márgenes en pantalla durante el desarrollo.",
+    "Proporciona una estructura de diseño estándar de alto nivel que reserva y coordina las ranuras (slots) para TopAppBar, BottomBar/NavigationBar, FloatingActionButton y SnackbarHost, gestionando los insets de ventana (window insets).",
+    "Es el contenedor que compila las funciones Composable en archivos de recursos para el sistema operativo.",
+    "Es el manejador de corrutinas encargado de cancelar las tareas de red cuando la pantalla pasa a segundo plano."
+  ],
+  "correctIndex": 1,
+  "feedback": "La respuesta correcta es b. Scaffold implementa la estructura visual básica de Material Design 3 proveyendo slots preconfigurados para barras de navegación, botones flotantes y contenido principal con paddingValues automáticos para evitar solapamientos con la barra de estado y gestos del sistema."
+},
+{
+  "question": "En la navegación tipada de Jetpack Compose (Type-Safe Navigation), ¿cómo se define una ruta de destino para garantizar seguridad de tipos en tiempo de compilación?",
+  "options": [
+    "Mediante una cadena de texto URL con parámetros en query string como 'pantalla_detalle?id={id}'.",
+    "Mediante una clase de datos (data class) o un objeto (data object) anotado con @Serializable de la librería Kotlinx Serialization.",
+    "Creando un archivo navigation.xml en la carpeta res/navigation con etiquetas <fragment> y <action>.",
+    "Definiendo un enum que contenga el identificador entero del recurso R.id de cada pantalla."
+  ],
+  "correctIndex": 1,
+  "feedback": "La respuesta correcta es b. En la navegación moderna Type-Safe de Compose (Navigation 2.8+), las rutas se definen como tipos Kotlin puros anotados con @Serializable (@Serializable data object Home; @Serializable data class Perfil(val userId: String)). Esto elimina cadenas mágicas propensas a errores y valida tipos al compilar."
+},
+{
+  "question": "Al navegar a una ruta tipada que requiere argumentos, ¿cómo se invoca la navegación en el NavController y cómo se extraen en la pantalla de destino?",
+  "options": [
+    "Se pasan mediante un Bundle en un Intent implícito y se leen llamando a getIntent().getExtras().",
+    "Se llama a navController.navigate(RutaConArgumentos(id = 123)) y en el destino se obtiene la instancia mediante backStackEntry.toRoute<RutaConArgumentos>().",
+    "Se guardan en SharedPreferences antes de llamar a navigate() y se recuperan del almacenamiento en la nueva pantalla.",
+    "Se envían como cabeceras HTTP ficticias en el despachador de navegación de Jetpack."
+  ],
+  "correctIndex": 1,
+  "feedback": "La respuesta correcta es b. Con la API Type-Safe se pasa directamente la instancia tipada a navController.navigate(Detalle(123)) y en la declaración del destino composable<Detalle> { backStackEntry -> val detalle = backStackEntry.toRoute<Detalle>() }, obteniendo las propiedades fuertemente tipadas sin parseos manuales."
+},
+{
+  "question": "¿Qué rol juegan los pares de roles 'Container' y 'On-Container' (ej. secondaryContainer y onSecondaryContainer) en el sistema de color de Material 3?",
+  "options": [
+    "Container define el color del borde del componente y On-Container define la animación de transición al hacer foco.",
+    "Container define el color de fondo de un elemento contenedor o tarjeta, mientras que On-Container garantiza un color de texto/ícono que cumple los estándares de contraste y legibilidad al situarse sobre ese contenedor específico.",
+    "Container se utiliza exclusivamente para dispositivos de escritorio y On-Container para pantallas de teléfonos pequeños.",
+    "Son etiquetas reservadas que el compilador de Compose utiliza para comprimir las imágenes vectoriales de la aplicación."
+  ],
+  "correctIndex": 1,
+  "feedback": "La respuesta correcta es b. La convención de diseño 'On-[Color]' en M3 asegura accesibilidad garantizada: todo elemento que se coloque 'sobre' (on) una superficie container debe usar su contraparte 'onContainer' para mantener el ratio de contraste WCAG exigido."
+},
+{
+  "question": "¿Cuál es la función del parámetro 'popUpTo' con 'inclusive = true' en las opciones de navegación (NavOptionsBuilder) de Jetpack Compose?",
+  "options": [
+    "Mostrar una ventana emergente tipo diálogo antes de cambiar de pantalla para solicitar confirmación al usuario.",
+    "Remover de la pila de retroceso (Back Stack) las pantallas intermedias hasta la ruta especificada, incluyendo esa misma ruta de destino, evitando acumulaciones de pantallas tras flujos como login o cierre de sesión.",
+    "Reiniciar el ciclo de vida de la Activity anfitriona forzando una llamada a onDestroy() y onCreate().",
+    "Limpiar la memoria caché de imágenes en disco antes de cargar el nuevo destino visual."
+  ],
+  "correctIndex": 1,
+  "feedback": "La respuesta correcta es b. popUpTo permite podar el Back Stack. Si al iniciar sesión se navega al Home, se usa popUpTo<LoginRoute> { inclusive = true } para eliminar la pantalla de Login de la pila y evitar que el usuario vuelva a ella al presionar el botón Atrás."
+},
+{
+  "question": "¿Qué representa la paleta tonal 'Neutral Variant' producida por el Motor Monet en Material Design 3?",
+  "options": [
+    "Los tonos más saturados reservados exclusivamente para los botones de acción principal (Call to Action).",
+    "Una gama de tonos neutros con un sutil matiz cromático extraído del fondo de pantalla, utilizada para bordes de componentes (outline), fondos de cajas de texto y superficies con contraste sutil.",
+    "Un conjunto de colores fijos de alto contraste diseñados específicamente para usuarios con daltonismo.",
+    "El perfil de color utilizado para exportar capturas de pantalla de la aplicación hacia la tienda Google Play."
+  ],
+  "correctIndex": 1,
+  "feedback": "La respuesta correcta es b. Monet genera 5 paletas tonales de 0 a 100 de luminosidad: Primary, Secondary, Tertiary, Neutral y Neutral Variant. Neutral Variant se reserva para elementos estructurales sutiles (superficies de variantes, bordes, divisores y contornos de campos de texto)."
+},
+{
+  "question": "¿Cuál es la principal diferencia entre NavigationBar (M3) y el anterior BottomNavigationView (M2)?",
+  "options": [
+    "NavigationBar de M3 utiliza indicadores de selección en forma de píldora activa con colores de contenedor y elimina las líneas de división fijas, adaptando su altura y tonalidad a las guías de Material You.",
+    "NavigationBar no permite más de dos botones, mientras que BottomNavigationView soportaba hasta diez botones simultáneos.",
+    "NavigationBar requiere permisos de red porque descarga los iconos vectoriales dinámicamente de los servidores de Google.",
+    "NavigationBar solo funciona en orientación horizontal (Landscape) y no es compatible con teléfonos en vertical."
+  ],
+  "correctIndex": 1,
+  "feedback": "La respuesta correcta es a. En M3, la NavigationBar adopta la píldora de selección flotante (active indicator), mayor altura para ergonomía táctil en pantallas modernas, integración de color dinámico y prescinde de sombras duras sustituyéndolas por elevación tonal de superficie."
+}
 ];
+
+if (typeof window !== 'undefined') {
+    window.questionsRDA2Tema78 = questionsRDA2Tema78;
+}

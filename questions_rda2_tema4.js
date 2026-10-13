@@ -250,3 +250,7 @@ const questionsRDA2Tema4 = [
     feedback: "La respuesta correcta es b. El Modifier en Compose es el sistema de decoración: se encadenan para aplicar padding, tamaño, colores, bordes, comportamientos de click. El ingeniero lo describe como 'adjetivos que definen la apariencia'. En SwiftUI el equivalente son los modificadores encadenados: .padding(), .background(), .font()."
   }
 ];
+
+if (typeof window !== 'undefined') {
+    window.questionsRDA2Tema4 = questionsRDA2Tema4;
+}
